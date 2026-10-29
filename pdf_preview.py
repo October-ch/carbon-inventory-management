@@ -8,7 +8,9 @@ import streamlit.components.v1 as components
 
 
 @st.cache_data(show_spinner=False, max_entries=5)
-def document_html(content, title):
+def document_html(content, title, language="zh-TW"):
+    is_en = language == "en"
+    page_label = (lambda page, count: f"Page {page} of {count}") if is_en else (lambda page, count: f"第 {page} 頁，共 {count} 頁")
     pages = []
     with pymupdf.open(stream=content, filetype="pdf") as pdf:
         count = len(pdf)
@@ -16,12 +18,15 @@ def document_html(content, title):
             pixmap = page.get_pixmap(matrix=pymupdf.Matrix(1.5, 1.5), alpha=False)
             encoded = base64.b64encode(pixmap.tobytes("jpeg", jpg_quality=82)).decode("ascii")
             pages.append(
-                f'<figure aria-label="第 {index+1} 頁，共 {count} 頁">'
+                f'<figure aria-label="{page_label(index+1, count)}">'
                 f'<img src="data:image/jpeg;base64,{encoded}" width="{pixmap.width}" height="{pixmap.height}" '
-                f'loading="{"eager" if index == 0 else "lazy"}" alt="{escape(title, quote=True)} 第 {index+1} 頁">'
-                f'<figcaption>第 {index+1} 頁／共 {count} 頁</figcaption></figure>'
+                f'loading="{"eager" if index == 0 else "lazy"}" alt="{escape(title, quote=True)} {page_label(index+1, count)}">'
+                f'<figcaption>{page_label(index+1, count)}</figcaption></figure>'
             )
-    return f'''<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><style>
+    language_tag = "en" if is_en else "zh-Hant"
+    continuous = f"Continuous preview · {count} pages · Scroll to read" if is_en else f"連續預覽 · 共 {count} 頁 · 直接捲動閱讀"
+    document_label = f"{escape(title)}, continuous page preview" if is_en else f"{escape(title)}，連續頁面預覽"
+    return f'''<!doctype html><html lang="{language_tag}"><head><meta charset="utf-8"><style>
       *{{box-sizing:border-box}}html,body{{margin:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#4d6357}}
       .viewer{{height:860px;border:1px solid #dce4dd;border-radius:9px;overflow:hidden;background:#e8ece8}}
       header{{height:42px;padding:12px 16px;background:#f6f8f5;border-bottom:1px solid #dce4dd;font-size:12px;display:flex;justify-content:space-between;gap:12px}}
@@ -30,11 +35,12 @@ def document_html(content, title):
       img{{width:100%;height:auto;display:block;background:white;box-shadow:0 2px 9px #233b291a}}
       figcaption{{padding-top:8px;text-align:center;font-size:11px;color:#78867d}}
       @media(max-width:650px){{main{{padding:10px}}header span{{display:none}}}}
-      </style></head><body><div class="viewer"><header>{escape(title)}<span>連續預覽 · 共 {count} 頁 · 直接捲動閱讀</span></header>
-      <main tabindex="0" role="document" aria-label="{escape(title, quote=True)}，連續頁面預覽">{''.join(pages)}</main></div></body></html>'''
+      </style></head><body><div class="viewer"><header>{escape(title)}<span>{continuous}</span></header>
+      <main tabindex="0" role="document" aria-label="{escape(document_label, quote=True)}">{''.join(pages)}</main></div></body></html>'''
 
 
-def render_pdf(content, title):
-    with st.spinner("正在載入文件預覽…"):
-        html = document_html(content, title)
+def render_pdf(content, title, language="zh-TW"):
+    spinner = "Loading document preview…" if language == "en" else "正在載入文件預覽…"
+    with st.spinner(spinner):
+        html = document_html(content, title, language)
     components.html(html, height=864, scrolling=False)

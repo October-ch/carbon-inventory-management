@@ -10,15 +10,16 @@ from uuid import uuid4
 import pymupdf
 
 from inventory import ROOT
+from localization import english_report
 
 EXPORT_DIR = ROOT / "exports"
 TEMPLATE_VERSION = "enterprise-demo-114-v2"
 CALCULATION_VERSION = "decimal-activity-factor-v1"
 
 
-def fingerprint(rows, narratives, source):
+def fingerprint(rows, narratives, source, language="zh-TW"):
     content = {"rows": rows, "narratives": narratives, "source": source,
-               "template": TEMPLATE_VERSION, "calculation": CALCULATION_VERSION}
+               "template": TEMPLATE_VERSION, "calculation": CALCULATION_VERSION, "language": language}
     return hashlib.sha256(json.dumps(content, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
 
 
@@ -33,11 +34,21 @@ def static_report(report):
 
 
 def make_pdf(report, record):
-    cover = f'''<div class="cover"><p>澄源科技股份有限公司（虛構）</p><h1>114 年溫室氣體盤查報告書</h1>
-      <p>模擬企業盤查 · 人工覆核版本</p><p>盤查期間：114 年 1 月 1 日至 12 月 31 日</p>
-      <p>覆核人：{escape(record['reviewer'])}<br>覆核時間：{escape(record['time'])}<br>
-      版本：{escape(record['version'])}<br>來源：{escape(record['source_name'])}</p>
-      <p>本文件為模擬資料與工作流程展示，非第三方查證聲明。</p></div>'''
+    if record.get("language") == "en":
+        report = english_report(report)
+        cover = f'''<div class="cover"><p>ClearSource Technology Co., Ltd. (fictional)</p><h1>Greenhouse Gas Inventory Report</h1>
+          <p>Demonstration inventory · Human-reviewed version</p><p>Reporting period: January 1–December 31, 2025</p>
+          <p>Reviewer: {escape(record['reviewer'])}<br>Review time: {escape(record['time'])}<br>
+          Version: {escape(record['version'])}<br>Source: {escape(record['source_name'])}</p>
+          <p>Simulated data and workflow demonstration; not a third-party verification statement.</p></div>'''
+        html_lang, pdf_title = "en", "2025 Demo Greenhouse Gas Inventory Report"
+    else:
+        cover = f'''<div class="cover"><p>澄源科技股份有限公司（虛構）</p><h1>114 年溫室氣體盤查報告書</h1>
+          <p>模擬企業盤查 · 人工覆核版本</p><p>盤查期間：114 年 1 月 1 日至 12 月 31 日</p>
+          <p>覆核人：{escape(record['reviewer'])}<br>覆核時間：{escape(record['time'])}<br>
+          版本：{escape(record['version'])}<br>來源：{escape(record['source_name'])}</p>
+          <p>本文件為模擬資料與工作流程展示，非第三方查證聲明。</p></div>'''
+        html_lang, pdf_title = "zh-Hant", "114年模擬企業溫室氣體盤查報告書"
     css = '''body{font-family:sans-serif;font-size:9pt;line-height:1.5;color:#24362f}
       .cover{text-align:center}
       .cover h1{font-size:23pt;margin:45pt 0} .cover p{margin:25pt 0}
@@ -51,7 +62,7 @@ def make_pdf(report, record):
       td:first-child,th:first-child{text-align:left}.footnote{font-size:8pt;color:#6e7b72}
       .report-number{color:#24362f;font-weight:bold}.subtitle{color:#627566}
       '''
-    html = '<html lang="zh-Hant"><body>' + static_report(report) + '</body></html>'
+    html = f'<html lang="{html_lang}"><body>' + static_report(report) + '</body></html>'
     story = pymupdf.Story(html=html, user_css=css)
     output = io.BytesIO()
     page_rect = pymupdf.paper_rect("a4")
@@ -65,20 +76,20 @@ def make_pdf(report, record):
         story.write(writer, rectangles)
     with pymupdf.open(stream=output.getvalue(), filetype="pdf") as pdf:
         first = pdf.new_page(pno=0, width=page_rect.width, height=page_rect.height)
-        first.insert_htmlbox(pymupdf.Rect(55, 140, page_rect.width-55, page_rect.height-85), '<html lang="zh-Hant"><body>'+cover+'</body></html>', css=css)
-        pdf.set_metadata({"title": "114年模擬企業溫室氣體盤查報告書", "author": record["reviewer"],
-                          "subject": "模擬資料；人工覆核；未經第三方查證", "keywords": record["fingerprint"]})
+        first.insert_htmlbox(pymupdf.Rect(55, 140, page_rect.width-55, page_rect.height-85), f'<html lang="{html_lang}"><body>'+cover+'</body></html>', css=css)
+        pdf.set_metadata({"title": pdf_title, "author": record["reviewer"],
+                          "subject": "Simulated data; human reviewed; not independently verified" if html_lang == "en" else "模擬資料；人工覆核；未經第三方查證", "keywords": record["fingerprint"]})
         for i, page in enumerate(pdf):
             page.insert_text((45, page.rect.height-23), f"{record['version']}  |  {i+1} / {len(pdf)}", fontsize=8, color=(.45,.5,.47))
         return pdf.tobytes(garbage=4, deflate=True)
 
 
-def freeze_report(rows, narratives, source, payload, reviewer, audit_log, revision):
+def freeze_report(rows, narratives, source, payload, reviewer, audit_log, revision, language="zh-TW"):
     if not reviewer.strip() or len(reviewer) > 80:
         raise ValueError("請輸入80字以內的覆核人名稱")
     record = {"version": datetime.now().strftime("%Y%m%d-%H%M%S") + "-" + uuid4().hex[:8],
               "time": datetime.now().astimezone().isoformat(timespec="seconds"), "reviewer": reviewer.strip(),
-              "fingerprint": fingerprint(rows, narratives, source), "source_name": source.get("filename", "內建模擬底稿"),
+              "fingerprint": fingerprint(rows, narratives, source, language), "source_name": source.get("filename", "內建模擬底稿"), "language": language,
               "template_version": TEMPLATE_VERSION, "calculation_version": CALCULATION_VERSION,
               "revision": revision, "simulation": True}
     # Render successfully before creating a persisted, approved output bundle.

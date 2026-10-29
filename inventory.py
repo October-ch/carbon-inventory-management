@@ -86,7 +86,7 @@ def csv_bytes(rows):
     return output.getvalue().encode("utf-8-sig")
 
 
-def build_payload(rows, selected="total", revision=0, narratives=None, source_name=None):
+def build_payload(rows, selected="total", revision=0, narratives=None, source_name=None, language="zh-TW"):
     metrics = {}
     grouped = defaultdict(list)
     for row in rows:
@@ -207,6 +207,15 @@ def build_payload(rows, selected="total", revision=0, narratives=None, source_na
       <div class="paper-footer">114 年度 · 模擬報告草稿 <span>由計算底稿連動產生</span></div>
     </article>"""
     display_rows = [{**r, "emissions": number(emission(r)), "raw_emissions": str(emission(r))} for r in rows]
-    return {"rows": display_rows, "sheets": SHEETS, "metrics": metrics, "report": report,
+    if language == "en":
+        from localization import english_report, SHEETS_EN
+        report = english_report(report)
+        for metric_data in metrics.values():
+            metric_data["label"] = english_report(metric_data["label"])
+            metric_data["formula"] = english_report(metric_data["formula"])
+        display_rows = [{**row, "sheet_label": SHEETS_EN.get(row["sheet"], row["sheet"])} for row in display_rows]
+    else:
+        display_rows = [{**row, "sheet_label": row["sheet"].replace("底稿", "")} for row in display_rows]
+    return {"rows": display_rows, "sheets": SHEETS, "metrics": metrics, "report": report, "language": language,
             "selected": selected if selected in metrics else "total", "revision": revision,
             "total": number(total), "group_totals": {k: number(v) for k, v in group_totals.items()}}
