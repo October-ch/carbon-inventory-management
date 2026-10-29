@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#f5f7f2" />
+  <title>碳盤查資料室｜企業碳盤查數據管理</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="#"><span class="brand-mark">碳</span><span><strong>碳盤查資料室</strong><small>CARBON DATA DESK</small></span></a>
+    <div class="workspace-label">工作空間</div>
+    <button class="workspace"><span class="workspace-icon">森</span><span><b>森嶼科技</b><small>2025 年度盤查</small></span><span class="chevron">⌄</span></button>
+    <div class="nav-label">盤查工作</div>
+    <nav>
+      <button class="nav-item active" data-view="overview"><span>◫</span>總覽</button>
+      <button class="nav-item" data-view="catalog"><span>▤</span>資料目錄 <i id="catalogCount">0</i></button>
+      <button class="nav-item" data-view="decisions"><span>✓</span>採用紀錄 <i id="decisionCount">0</i></button>
+      <button class="nav-item" data-view="versions"><span>↻</span>版本追蹤</button>
+    </nav>
+    <div class="sidebar-bottom"><div class="help-icon">?</div><span><b>需要協助？</b><small>查看欄位與比較說明</small></span><span class="arrow">↗</span></div>
+    <div class="profile"><div class="avatar">林</div><span><b>林怡君</b><small>盤查管理員</small></span><button aria-label="設定">···</button></div>
+  </aside>
+  <main class="main">
+    <header class="topbar"><div class="crumb">工作空間 <span>/</span> <b id="crumbTitle">總覽</b></div><div class="top-actions"><span class="saved"><i></i> 所有變更已儲存</span><button class="icon-button" title="通知">♧<em></em></button><button class="help-button">使用說明 <span>↗</span></button></div></header>
+    <div class="content">
+      <section class="view active" id="overviewView">
+        <div class="page-head"><div><div class="eyebrow"><span id="dateStamp"></span><span>·</span> 盤查年度 2025</div><h1>早安，怡君 <span class="wave">✳</span></h1><p>把資料來源、適用條件與採用決策，整理在同一個地方。</p></div><button class="primary" id="addDataTop"><span>＋</span> 新增資料</button></div>
+        <div class="stats"><article class="stat-card"><div class="stat-top"><span>資料目錄</span><span class="stat-icon mint">▤</span></div><div class="stat-value" id="statData">—</div><div class="stat-foot"><span class="green-dot"></span> 活動數據、係數與強度</div></article><article class="stat-card"><div class="stat-top"><span>待覆核項目</span><span class="stat-icon amber">◷</span></div><div class="stat-value" id="statReview">—</div><div class="stat-foot"><span class="orange-text">需要人工確認</span></div></article><article class="stat-card"><div class="stat-top"><span>已完成採用</span><span class="stat-icon blue">✓</span></div><div class="stat-value" id="statAdopted">—</div><div class="stat-foot"><span class="green-dot"></span> 附理由與版本紀錄</div></article><article class="stat-card"><div class="stat-top"><span>版本更新提示</span><span class="stat-icon violet">↻</span></div><div class="stat-value" id="statUpdates">—</div><div class="stat-foot"><span class="muted">不會自動改寫舊盤查</span></div></article></div>
+        <div class="work-grid"><section class="panel catalog-panel"><div class="panel-heading"><div><h2>最近更新的資料</h2><p>檢視候選資料與來源資訊</p></div><button class="text-button" data-go="catalog">查看資料目錄 <span>→</span></button></div><div class="toolbar"><label class="search"><span>⌕</span><input id="homeSearch" placeholder="搜尋名稱、來源或排放源…" /></label><button class="filter-button" data-go="catalog">篩選 <span>☷</span></button></div><div class="table-wrap"><table><thead><tr><th>資料名稱</th><th>資料類型</th><th>適用年度</th><th>來源</th><th>狀態</th><th></th></tr></thead><tbody id="recentRows"></tbody></table></div><button class="mobile-catalog-link" data-go="catalog">查看完整資料目錄 →</button></section>
+          <aside class="right-rail"><section class="panel task-panel"><div class="panel-heading"><div><h2>待處理事項</h2><p>完成資料覆核，讓決策可追溯</p></div><span class="task-count" id="taskCount">0</span></div><div id="tasks"></div><button class="secondary full" data-go="decisions">查看所有紀錄 <span>→</span></button></section><section class="tip-card"><div class="tip-art"><span class="sun">☼</span><span class="leaf">♧</span></div><div class="tip-kicker">資料評估小提醒</div><h3>先確認邊界，再比較數值</h3><p>年度、地區、活動定義與生命週期邊界不同時，數值可能不可直接比較。</p><button class="tip-link" id="tipRead">了解比較原則 <span>↗</span></button></section></aside></div>
+        <footer class="footer-note"><span>◎</span> 本工具提供資料整理與決策輔助，不自動判定符合標準或替代專業判斷。</footer>
+      </section>
+      <section class="view" id="catalogView"><div class="page-head"><div><div class="eyebrow">DATA LIBRARY</div><h1>資料目錄</h1><p>管理活動數據、排放係數與排放強度，逐筆保留來源脈絡。</p></div><button class="primary" id="addDataCatalog"><span>＋</span> 新增資料</button></div><div class="panel catalog-full"><div class="toolbar"><label class="search"><span>⌕</span><input id="catalogSearch" placeholder="搜尋名稱、來源或排放源…" /></label><select id="typeFilter"><option value="">所有資料類型</option><option>活動數據</option><option>排放係數</option><option>排放強度</option></select><select id="statusFilter"><option value="">所有狀態</option><option>待評估</option><option>已採用</option><option>已排除</option></select><button class="secondary" id="exportCatalog">匯出 CSV ↓</button></div><div class="table-wrap"><table><thead><tr><th>資料名稱</th><th>資料類型 / 排放源</th><th>數值</th><th>地區 / 年度</th><th>來源</th><th>狀態</th><th></th></tr></thead><tbody id="catalogRows"></tbody></table></div><div class="table-empty" id="catalogEmpty" hidden>沒有符合條件的資料，試試其他關鍵字或新增資料。</div></div><footer class="footer-note"><span>◎</span> ISO 14064-1 與 GHG Protocol 分開記錄；分類標籤不代表兩者可直接互換。</footer></section>
+      <section class="view" id="decisionsView"><div class="page-head"><div><div class="eyebrow">AUDIT TRAIL</div><h1>採用紀錄</h1><p>查看資料的採用、排除決策與覆核狀態。</p></div><button class="secondary" id="exportDecisions">匯出紀錄 CSV ↓</button></div><div class="panel catalog-full"><div class="toolbar"><label class="search"><span>⌕</span><input id="decisionSearch" placeholder="搜尋資料名稱或決策理由…" /></label><select id="decisionFilter"><option value="">所有狀態</option><option>待覆核</option><option>已覆核</option></select></div><div class="table-wrap"><table><thead><tr><th>資料名稱</th><th>盤查年度</th><th>決策</th><th>採用理由 / 排除原因</th><th>覆核</th><th>日期</th><th></th></tr></thead><tbody id="decisionRows"></tbody></table></div><div class="table-empty" id="decisionEmpty" hidden>尚無符合條件的採用紀錄。</div></div></section>
+      <section class="view" id="versionsView"><div class="page-head"><div><div class="eyebrow">VERSION HISTORY</div><h1>版本追蹤</h1><p>來源更新建立為新版本，保留已完成盤查的歷史快照。</p></div><button class="primary" id="addVersion">＋ 新增版本</button></div><div class="panel catalog-full"><div class="panel-heading"><div><h2>來源版本與更新紀錄</h2><p>每個版本保留發佈資訊、適用年度與更新摘要</p></div><span class="version-badge">歷史版本保留中</span></div><div class="version-list" id="versionList"></div></div><div class="footer-note"><span>↻</span> 新版本不會自動改寫任何既有採用紀錄；請由盤查人員評估是否重新採用。</div></section>
+    </div>
+  </main>
+  <div class="overlay" id="overlay"><div class="modal" id="modal"></div></div>
+  <div class="toast" id="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>

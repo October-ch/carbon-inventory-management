@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="workspace.css">
+  <title>盤查底稿與報告連動</title>
+</head>
+<body>
+  <div id="workspace" aria-label="報告與底稿連動工作區">
+    <div class="workspace-guide"><span class="live-dot"></span><strong>資料與報告即時連動</strong><span>點選右側藍色數字，追溯左側來源；雙擊底稿活動量或係數可修改。</span><span id="revision" class="revision"></span></div>
+    <div class="split-view">
+      <section class="source-panel panel" aria-label="計算底稿">
+        <header class="panel-head"><div><div class="eyebrow">SOURCE WORKPAPERS</div><h2>資料來源與計算底稿</h2></div><span id="row-count" class="badge"></span></header>
+        <div id="lineage" class="lineage" aria-live="polite"></div>
+        <div class="sheet-nav" id="sheet-nav" aria-label="底稿工作表"></div>
+        <div class="source-toolbar"><label class="search-box"><span>⌕</span><input id="search" type="search" placeholder="搜尋月份、項目或憑證編號" aria-label="搜尋底稿"></label><button id="only-related" class="text-button" aria-pressed="false">只看關聯列</button></div>
+        <div class="table-scroll" id="source-scroll"><table class="workpaper"><thead><tr><th>底稿列</th><th>期間／項目</th><th>活動量</th><th>係數</th><th>排放量<br>tCO₂e</th></tr></thead><tbody id="source-body"></tbody></table></div>
+        <div class="evidence" id="evidence" aria-live="polite"></div>
+        <footer class="source-footer"><span>● 藍色：報告引用列</span><span>活動量 × kgCO₂e 係數 ÷ 1,000</span></footer>
+      </section>
+      <section class="report-panel panel" aria-label="互動報告書">
+        <header class="panel-head"><div><div class="eyebrow">LINKED INVENTORY REPORT</div><h2>114 年溫室氣體盤查報告書</h2></div><span class="badge blue">互動草稿</span></header>
+        <nav class="report-nav" aria-label="報告章節"><button data-section="report-overview">排放量計算</button><button data-section="report-boundary">邊界與鑑別</button><button data-section="report-method">量化方法</button><button data-section="report-detail">數據明細</button></nav>
+        <div class="report-scroll" id="report-scroll"><div id="report-content"></div></div>
+      </section>
+    </div>
+    <div id="status" class="status" role="status">準備載入計算底稿…</div>
+  </div>
+  <script src="workspace.js"></script>
+</body>
+</html>

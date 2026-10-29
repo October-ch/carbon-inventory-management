@@ -1,0 +1,14 @@
+[
+  {
+    "filename": "114年_模擬企業盤查底稿_v1.xlsx",
+    "version": "v1",
+    "sha256": "29b12003863379154b0da2656c46fa551f85b61d9065bbce60dc71ba3c74519f",
+    "description": "初始底稿：總量 447.141 tCO₂e"
+  },
+  {
+    "filename": "114年_模擬企業盤查底稿_v2.xlsx",
+    "version": "v2",
+    "sha256": "6e9054adc1f24ad22c7e79baf6190100ca7d0c90287258b4c528e526f4f5131a",
+    "description": "更新底稿：1月用電增加1,000度、12月增加2,000度；總量448.551 tCO₂e"
+  }
+]
